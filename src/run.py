@@ -65,7 +65,9 @@ def admin():
 
 @app.route('/admin/admin')
 def admin_admin():
-    return render_template('admin/admin.html',isAdmin=isAdmin(session),admins=sql.getAdmin())
+    if "id" in session and session["id"]=="admin":
+        return render_template('admin/admin.html',isAdmin=isAdmin(session),admins=sql.getAdmin())
+    return redirect(url_for('admin'))
 
 @app.route('/admin/admin_add',methods=["POST","GET"])
 def admin_add():
@@ -88,7 +90,7 @@ def admin_change():
 
 @app.route('/admin/student')
 def admin_student():
-    return render_template('admin/student.html',isAdmin=isAdmin(session),students=sql.getStudents())
+    return render_template('admin/student.html',session=session,isAdmin=isAdmin(session),students=sql.getStudents())
 
 @app.route('/admin/reg',methods=["POST","GET"])
 def reg():
@@ -122,7 +124,7 @@ def visitor():
         temp = [vis[i][j] for j in range(0,5)]
         temp.append(sql.getStudentName(temp[4]))
         newvis.append(temp)
-    return render_template('admin/visitor.html',isAdmin=isAdmin(session),visitors=newvis)
+    return render_template('admin/visitor.html',session=session,isAdmin=isAdmin(session),visitors=newvis)
 
 @app.route('/admin/visitor_add',methods=["POST","GET"])
 def visitor_add():
@@ -155,7 +157,7 @@ def valuables():
         temp = [val[i][j] for j in range(0,4)]
         temp.append(sql.getStudentName(temp[2]))
         newval.append(temp)
-    return render_template('admin/valuables.html',isAdmin=isAdmin(session),valuabless=newval)
+    return render_template('admin/valuables.html',session=session,isAdmin=isAdmin(session),valuabless=newval)
 
 @app.route('/admin/valuables_add',methods=["POST","GET"])
 def valuables_add():
@@ -180,7 +182,7 @@ def valuables_delete():
 
 @app.route('/admin/cost')
 def cost():
-    return render_template('admin/cost.html',isAdmin=isAdmin(session),costs=sql.get_cost())
+    return render_template('admin/cost.html',session=session,isAdmin=isAdmin(session),costs=sql.get_cost())
 
 @app.route('/admin/cost_add',methods=["POST","GET"])
 def cost_add():
@@ -204,7 +206,7 @@ def cost_delete():
 
 @app.route('/admin/bulletin')
 def bulletin():
-    return render_template('admin/bulletin.html',isAdmin=isAdmin(session),bulletins=sql.get_bulletin())
+    return render_template('admin/bulletin.html',session=session,isAdmin=isAdmin(session),bulletins=sql.get_bulletin())
 
 @app.route('/admin/bulletin_add',methods=["POST","GET"])
 def bulletin_add():

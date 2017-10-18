@@ -31,9 +31,11 @@
                     <li class="nav5">
                         <a href="/admin/cost">寝室费用登记</a>
                     </li>
+                    {% if session["id"] == "admin" %}
                     <li class="nav6">
                         <a href="/admin/admin">管理员管理</a>
                     </li>
+                    {% endif %}
                     <li>
                         <a href="/logout">退出登陆</a>
                     </li>
@@ -56,9 +58,11 @@
                     <li class="nav5">
                         <a href="/admin/cost">寝室费用登记</a>
                     </li>
+                    {% if session["id"] == "admin" %}
                     <li class="nav6">
                         <a href="/admin/admin">管理员管理</a>
                     </li>
+                    {% endif %}
                     <li>
                         <a href="/logout">退出登陆</a>
                     </li>

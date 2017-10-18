@@ -7,6 +7,24 @@ def md5(string):
     m = hashlib.md5()   
     m.update(string.encode("utf-8"))   
     return m.hexdigest()
+# 登陆 - 管理员账号
+def admin_login(username,password):
+    conn = connect_database()
+    c = conn.cursor()
+    c.execute("select password from admin where id='%s';" %(username))
+    res = c.fetchall()
+    if len(res)==0:
+        print("no user")
+        return False
+    passwordmd5 = res[0][0]
+    if md5(password) == passwordmd5:
+        print("login successful.")
+        conn.close()
+        return True
+    else:
+        print("wrong password.")
+        conn.close()
+        return False
 # 登陆 - 学生登陆
 def login(username,password):
     conn = connect_database()
@@ -54,7 +72,7 @@ def student_update(oldid,Id,password,realname,sex,sushelou,qinshihao):
     conn = connect_database()
     c = conn.cursor()
 
-    c.execute( "select password from user where id = '%s'"%(Id))
+    c.execute( "select password from user where id = '%s'"%(oldid))
     if password != c.fetchall()[0][0]:
         password=md5(password)
 
@@ -355,6 +373,64 @@ def getLastIDofdisscuss():
     conn.close()
     return Id
 
+# 管理员管理 - 获取所有管理员id
+def getAdmin():
+    conn = connect_database()
+    c = conn.cursor()
+    c.execute("select * from admin order by id DESC;") #  limit 1
+    t = c.fetchall()
+    conn.close()
+    return t
+
+# 管理员管理 - 注册
+def admin_add(Id,password):
+    conn = connect_database()
+    c = conn.cursor()
+    
+    c.execute("select * from admin where id == '%s';"%(Id))
+    if len(c.fetchall()) != 0:
+        print("id has been used.")
+        conn.close()
+        return False
+
+    # uid = getLastID(conn);
+    # uid = str(int(uid)+1)
+    
+    password = md5(password)
+
+    string = "insert into admin(id,password) values('%s','%s');"
+    c.execute( string % (Id,password))
+
+    conn.commit()
+    print("register successful.")
+    conn.close()
+    return True
+
+def admin_update(oldid,Id,password):
+    conn = connect_database()
+    c = conn.cursor()
+
+    c.execute( "select password from admin where id = '%s'"%(Id))
+    if password != c.fetchall()[0][0]:
+        password=md5(password)
+
+    string = "update admin set id='%s',password='%s' where id='%s';"
+    c.execute( string % (Id,password,oldid))
+
+    conn.commit()
+    print("register successful.")
+    conn.close()
+    return True
+
+# 管理员管理 - 删除
+def admin_delete(Id):
+    conn = connect_database()
+    c = conn.cursor()
+
+    c.execute("delete from admin where id == '%s';"%(Id))
+
+    conn.commit()
+    conn.close()
 
 def create_table(conn):
     c = conn.cursor()
@@ -407,6 +483,11 @@ def create_table(conn):
             content     text,
             time        text,
             PRIMARY KEY(id))''')
+    c.execute('''create table admin
+        (   id          text        not null,
+            password    text        not null,
+            PRIMARY KEY(id))''')
+
     print ("Table created successfully")
     
 

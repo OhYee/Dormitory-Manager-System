@@ -14,10 +14,11 @@ def gettime():
 def t():
     return render_template('test.html',isAdmin=isAdmin(session))
 
+
 @app.route('/')
 def index():
     if 'id' in session:
-        if session['id'] == 'admin':
+        if isAdmin(session)==True:
             return redirect(url_for('admin'))
         else:
             return redirect(url_for('student'))
@@ -26,7 +27,7 @@ def index():
 @app.route('/#')
 def index_error():
     if 'id' in session:
-        if session['id'] == 'admin':
+        if isAdmin(session)==True:
             return redirect(url_for('admin'))
         else:
             return redirect(url_for('student'))
@@ -40,9 +41,14 @@ def login():
         if username == 'admin' and passwd == 'admin':
             # 管理员
             session['id'] = username
+            session['isAdmin'] = True
+        elif sql.admin_login(username,passwd):
+            session['id'] = username
+            session['isAdmin'] = True
         else:
             if sql.login(username,passwd):
                 session['id'] = username
+                session['isAdmin'] = False
     return redirect(url_for('index_error'))
 
 
@@ -54,7 +60,31 @@ def logout():
 
 @app.route('/admin')
 def admin():
-    return render_template('admin/admin.html',isAdmin=isAdmin(session))
+    return render_template('admin/index.html',session=session,isAdmin=isAdmin(session))
+
+
+@app.route('/admin/admin')
+def admin_admin():
+    return render_template('admin/admin.html',isAdmin=isAdmin(session),admins=sql.getAdmin())
+
+@app.route('/admin/admin_add',methods=["POST","GET"])
+def admin_add():
+    if request.method == 'POST':
+        status = sql.admin_add(request.form['id'],request.form['id'])
+    return redirect(url_for('admin_admin'))
+
+@app.route('/admin/admin_delete',methods=["POST","GET"])
+def admin_delete():
+    if request.method == 'POST':
+        sql.admin_delete(request.form['id'])
+    return redirect(url_for('admin_admin'))
+
+@app.route('/admin/admin_change',methods=["POST","GET"])
+def admin_change():
+    if request.method == 'POST':
+        sql.admin_update(request.form['oldid'],request.form['id'],request.form['password'])
+    return redirect(url_for('admin_admin'))
+
 
 @app.route('/admin/student')
 def admin_student():
@@ -263,6 +293,5 @@ def init():
 #     return render_template('404.html', config=get_config(), error=error), 404
 
 if __name__ == '__main__':
-    config = get_config()
     app.run(debug=True)
     

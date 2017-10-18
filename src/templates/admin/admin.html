@@ -2,6 +2,7 @@
 <html>
 
     <head>
+        <title>学生管理</title>
         {% include './layout/head.html' %}
 
     </head>
@@ -9,32 +10,68 @@
     <body>
 
         {% include './admin/header.html' %}
+        <script>
+            $('.nav6').toggleClass('active');
+        </script>
         <main>
             <div class="container">
                 <div id="main-card" class="card valign-wrapper">
                     <div class="container valign">
+
                         {% if isAdmin %}
-                        <p>你好，管理员！</p>
-                        <p>在这里选择您需要的操作：
-                            <ul class="center">
-                                <li>
-                                    <a href="/admin/bulletin">公告管理</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/student">学生管理</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/visitor">访客管理</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/valuables">贵重物品管理</a>
-                                </li>
-                                <li>
-                                    <a href="/admin/cost">寝室费用登记</a>
-                                </li>
-                            </ul>
-                        </p>
+                        <form action="/admin/admin_add" method="post">
+                            <div class="input-field">
+                                <input id="id" name="id" type="text" class="validate">
+                                <label for="id">账号</label>
+                            </div>
+                            <button class="btn waves-effect waves-light right blue" type="submit" name="action">提交
+                                <i class="material-icons right">send</i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div id="main-card" class="card valign-wrapper">
+                    <div class="container valign">
+                        <table class="bordered highlight centered">
+                            <thead>
+                                <tr>
+                                    <th>账号</th>
+                                    <th>密码</th>
+                                    <th>修改</th>
+                                    <th>删除</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for admin in admins %}
+                                <tr>
+                                    <form action="/admin/admin_change" method="post">
+                                        <input type=hidden name=oldid value={{ admin[0] }}>
+                                        <td>
+                                            <input type=text name=id value={{ admin[0] }}>
+                                        </td>
+                                        <td>
+                                            <input type=text name=password value={{ admin[1] }}>
+                                        </td>
+                                        <td>
+
+                                            <button class="btn waves-effect waves-light right blue lighten-2" type="submit" name="action">修改
+                                            </button>
+
+                                        </td>
+                                    </form>
+                                    <td>
+                                        <form action="/admin/admin_delete" method="post">
+                                            <input type=hidden name=id value={{ admin[0] }}>
+                                            <button class="btn waves-effect waves-light right blue lighten-2" type="submit" name="action">删除
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                         {% else %} {% include '/admin/notadmin.html' %} {% endif %}
+
                     </div>
                 </div>
             </div>
